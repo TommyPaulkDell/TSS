@@ -87,10 +87,10 @@ Function DisplayMenu {
     Write-Host "Below symbols are not allowed." -ForegroundColor Yellow -BackgroundColor DarkGray
     Write-Host "=> Illegal characters/symbols: #<>*_/\{}$+%`|=@\" -ForegroundColor Yellow -BackgroundColor DarkGray
     If ($CaseNumber -eq $ENV:COMPUTERNAME) { $CaseNumberString = Read-Host -Prompt "Please enter relevant case number or Service tag (or press enter to use $CaseNumber)" }
-        if (!([string]::IsNullOrWhiteSpace($CaseNumberString)))
-            {
-                $CaseNumber = $CaseNumberString
-            }
+    if (!([string]::IsNullOrWhiteSpace($CaseNumberString)))
+    {
+        $CaseNumber = $CaseNumberString
+    }
               
     $MENU = Read-Host "Start the collection (Y/N)"
     switch ($MENU)

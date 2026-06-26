@@ -167,7 +167,7 @@ Function DisplayMenu {
             DisplayMenu
         }
     }
-}
+
 Set-PSDebug -Trace 0
 $dell = "c:\Dell\"
 $TSS = "C:\dell\Tss\"
@@ -222,7 +222,7 @@ else
 }
 
 clear-host
-$Ver = "1.5"
+$Ver = "1.6"
 
 #IE Fix#
 Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Internet Explorer\Main" -Name "DisableFirstRunCustomize" -Value 2

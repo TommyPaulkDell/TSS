@@ -19,8 +19,17 @@ V 1.4
 V 1.5
     Added Check-ISEEnvironment to display a warning when run in PowerShell ISE.
     Removed the SDDC collection from SDPList for non-HCI clusters.
+V 1.6
+    Forked to TommyPaulkDell for the DE support team
+    Cleaned up and added some checks to avoid log deletion
 #>
 Function Invoke-TssCollect {
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'High')]
+        param(
+        [Parameter(Mandatory=$False)]
+         [string] $CaseNumber=($ENV:COMPUTERNAME))
 Function Check-ISEEnvironment {
     <#
     .SYNOPSIS
@@ -69,7 +78,7 @@ Function DisplayMenu {
     |                                                                      | 
     |                                           v$Ver                       |     
     |                                                                      |
-    |                               By: Fabiano Inacio                     |
+    |                               By: Fabiano Inacio/Tommy Paulk         |
     |                                                                      |
     |                                                                      |
     +======================================================================+
@@ -77,10 +86,10 @@ Function DisplayMenu {
 "@
     Write-Host "Below symbols are not allowed." -ForegroundColor Yellow -BackgroundColor DarkGray
     Write-Host "=> Illegal characters/symbols: #<>*_/\{}$+%`|=@\" -ForegroundColor Yellow -BackgroundColor DarkGray
-    if ($CaseNumber.length -eq 0) { $CaseNumber = Read-Host -Prompt "Please enter relevant case number or Service tag" }
-        if ([string]::IsNullOrWhiteSpace($CaseNumber))
+    $CaseNumberString = Read-Host -Prompt "Please enter relevant case number or Service tag (or press enter to use $($ENV:COMPUTERNAME))" }
+        if (!([string]::IsNullOrWhiteSpace($CaseNumberString)))
             {
-                $CaseNumber = "TSS Collection $DateTime"
+                $CaseNumber = $CaseNumberString
             }
               
     $MENU = Read-Host "Start the collection (Y/N)"
@@ -92,96 +101,59 @@ Function DisplayMenu {
     #OPTION - Cluster Collection#
             
             Invoke-Expression -Command "C:\dell\Tss\TSS.ps1 -sdp Cluster -skipsdplist skipBPA, skipSDDC -LogFolderPath $dell -AcceptEula"
-            Set-Location $tss
-
-            #Compressing logs#
-            clear-host
+            $SourcePath="C:\Dell\SDP_Cluster\*Cluster.zip"
             $sourceFolder = "C:\Dell\SDP_Cluster\"
-            Write-Host "Compressing $sourceFolder folder to " c:\Dell\Logs\$CaseNumber.zip". This might take a while."
-            $logtemp = Get-ChildItem -Path c:\Dell\SDP_Cluster\*Cluster.zip
-            Move-Item -Path c:\Dell\SDP_Cluster\*Cluster.zip -Destination "c:\Dell\Logs\$CaseNumber.zip"
 
-            Remove-Item "C:\Dell\SDP_*" -Recurse -Force -ErrorAction Ignore
-            $Shell = New-Object -ComObject "WScript.Shell"
-            $Button = $Shell.Popup("Logs available at c:\Dell\Logs",0,"Collection Successfull",0)
-            Start-Sleep -Seconds 2
-            Remove-Variable CaseNumber
-            clear-host
-            Write-Host "Bye"
-            Stop-Transcript
-            EndScript
+            
             }
     ELSEIF  (get-WindowsFeature -Name Hyper-V | where Installed) {
     #OPTION - HyperV Collection#
             
             Invoke-Expression -Command "C:\dell\Tss\TSS.ps1 -sdp HyperV -skipsdplist skipBPA -LogFolderPath $dell -AcceptEula"
-            Set-Location $tss
-
-            #Compressing logs#
-            clear-host
+            $SourcePath="c:\Dell\SDP_HyperV\*HyperV.zip"
             $sourceFolder = "C:\Dell\SDP_HyperV\"
-            Write-Host "Compressing $sourceFolder folder to " c:\Dell\Logs\$CaseNumber.zip". This might take a while."
-            $logtemp = Get-ChildItem -Path c:\Dell\SDP_HyperV\*HyperV.zip
-            Move-Item -Path c:\Dell\SDP_HyperV\*HyperV.zip -Destination "c:\Dell\Logs\$CaseNumber.zip"
 
-            Remove-Item "C:\Dell\SDP_*" -Recurse -Force -ErrorAction Ignore
-            $Shell = New-Object -ComObject "WScript.Shell"
-            $Button = $Shell.Popup("Logs available at c:\Dell\Logs",0,"Collection Successfull",0)
-            Start-Sleep -Seconds 2
-            Remove-Variable CaseNumber
-            clear-host
-            Write-Host "Bye"
-            Stop-Transcript
-            EndScript
             }
     ELSEIF  (get-WindowsFeature -Name AD-Domain-Services | where Installed) {
     #OPTION - Active Directory Collection#
            
             Invoke-Expression -Command "C:\dell\Tss\TSS.ps1 -sdp DOM -skipsdplist skipBPA -LogFolderPath $dell -AcceptEula"
-            Set-Location $tss
-
-            #Compressing logs#
-            clear-host
             $sourceFolder = "C:\Dell\SDP_DOM\"
-            Write-Host "Compressing $sourceFolder folder to " c:\Dell\Logs\$CaseNumber.zip". This might take a while."
-            $logtemp = Get-ChildItem -Path C:\Dell\SDP_DOM\*DOM.zip
-            Move-Item -Path C:\Dell\SDP_DOM\*DOM.zip -Destination "c:\Dell\Logs\$CaseNumber.zip"
+            $SourcePath = "C:\Dell\SDP_DOM\*DOM.zip"
 
-            Remove-Item "C:\Dell\SDP_*" -Recurse -Force -ErrorAction Ignore
-            $Shell = New-Object -ComObject "WScript.Shell"
-            $Button = $Shell.Popup("Logs available at c:\Dell\Logs",0,"Collection Successfull",0)
-            Start-Sleep -Seconds 2
-            Remove-Variable CaseNumber
-            clear-host
-            Write-Host "Bye"
-            Stop-Transcript
-            EndScript
             }
     ELSE {
     #OPTION - Default Collection#
   
             Invoke-Expression -Command "C:\dell\Tss\TSS.ps1 -sdp Setup -skipsdplist skipBPA -LogFolderPath $dell -AcceptEula"
-            Set-Location $tss
-
-            #Compressing logs#
-            clear-host
             $sourceFolder = "C:\Dell\SDP_Setup\"
-            Write-Host "Compressing $sourceFolder folder to " c:\Dell\Logs\$CaseNumber.zip". This might take a while."
-            $logtemp = Get-ChildItem -Path C:\Dell\SDP_Setup\*Setup.zip
-            Move-Item -Path C:\Dell\SDP_Setup\*Setup.zip -Destination "c:\Dell\Logs\$CaseNumber.zip"
+            $SourcePath = "C:\Dell\SDP_Setup\*Setup.zip"
 
-            Remove-Item "C:\Dell\SDP_*" -Recurse -Force -ErrorAction Ignore
-            $Shell = New-Object -ComObject "WScript.Shell"
-            $Button = $Shell.Popup("Logs available at c:\Dell\Logs",0,"Collection Successfull",0)
-            Start-Sleep -Seconds 2
-            Remove-Variable CaseNumber
-            clear-host
-            Write-Host "Bye"
-            Stop-Transcript
-            EndScript
-}
+    }
+    try {
+        Set-Location $tss
 
-            }
+        #Compressing logs#
+        clear-host
+            
+        Write-Host "Compressing $sourceFolder folder to " c:\Dell\Logs\$CaseNumber.zip". This might take a while."
+        $logtemp = Get-ChildItem -Path "$sourcefolder\*Cluster.zip"
+        Move-Item -Path $SourcePath -Destination "c:\Dell\Logs\$CaseNumber.zip"
+
+        Remove-Item "C:\Dell\SDP_*" -Recurse -Force -ErrorAction Ignore
+        $Shell = New-Object -ComObject "WScript.Shell"
+        $Button = $Shell.Popup("Logs available at c:\Dell\Logs",0,"Collection Successfull",0)
+        Start-Sleep -Seconds 2
+    } catch {
+        Write-Host "Could not move log files to zip. Log file source is ($sourceFolder)" -ForegroundColor Red
+    } finally {
+        Remove-Variable CaseNumber
+        clear-host
+        Write-Host "Bye"
+        Stop-Transcript
+        EndScript
+    }
+        }
         N {
             #OPTIONQ - EXIT#
             Write-Host "Bye"
@@ -195,7 +167,6 @@ Function DisplayMenu {
             DisplayMenu
         }
     }
-
 }
 Set-PSDebug -Trace 0
 $dell = "c:\Dell\"

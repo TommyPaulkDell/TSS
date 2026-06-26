@@ -29,7 +29,7 @@ Function Invoke-TssCollect {
         ConfirmImpact = 'High')]
         param(
         [Parameter(Mandatory=$False)]
-         [string] $CaseNumber=($ENV:COMPUTERNAME))
+         [string] $CaseNumber=$ENV:COMPUTERNAME)
 Function Check-ISEEnvironment {
     <#
     .SYNOPSIS

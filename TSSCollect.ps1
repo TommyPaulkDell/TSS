@@ -136,16 +136,16 @@ Function DisplayMenu {
         #Compressing logs#
         #clear-host
             
-        Write-Host "Compressing $sourceFolder folder to " c:\Dell\Logs\$CaseNumber.zip". This might take a while."
+        Write-Host "Moving $sourceFolder zip file to " c:\Dell\Logs\$CaseNumber.zip". This might take a while."
         $logtemp = Get-ChildItem -Path "$sourcefolder\*Cluster.zip"
-        Move-Item -Path $SourcePath -Destination "c:\Dell\Logs\$CaseNumber.zip"
+        Get-Childitem C:\Dell\SDP_*.zip -Recurse | Sort LastWriteTime | Select -Last 1 | %{ Move-Item -Path $_.fullname -Destination "c:\Dell\Logs\$CaseNumber.zip"}
 
         Remove-Item "C:\Dell\SDP_*" -Recurse -Force -ErrorAction Ignore
         $Shell = New-Object -ComObject "WScript.Shell"
         $Button = $Shell.Popup("Logs available at c:\Dell\Logs",0,"Collection Successfull",0)
         Start-Sleep -Seconds 2
     } catch {
-        Write-Host "Could not move log files to zip. Log file source is ($sourceFolder)" -ForegroundColor Red
+        Write-Host "Could not move log files to zip. Log file source is ($SourcePath)" -ForegroundColor Red
     } finally {
         Remove-Variable CaseNumber
         #clear-host

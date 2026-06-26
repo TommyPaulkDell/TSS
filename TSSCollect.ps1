@@ -63,7 +63,7 @@ Break
 Function DisplayMenu {
     $DateTime = Get-Date -Format yyyyMMdd_HHmmss
     Start-Transcript -NoClobber -Path "C:\Dell\TssCollect_$DateTime.log"
-    clear-host
+    #clear-host
 
     Write-Host @"
 
@@ -134,7 +134,7 @@ Function DisplayMenu {
         Set-Location $tss
 
         #Compressing logs#
-        clear-host
+        #clear-host
             
         Write-Host "Compressing $sourceFolder folder to " c:\Dell\Logs\$CaseNumber.zip". This might take a while."
         $logtemp = Get-ChildItem -Path "$sourcefolder\*Cluster.zip"
@@ -148,7 +148,7 @@ Function DisplayMenu {
         Write-Host "Could not move log files to zip. Log file source is ($sourceFolder)" -ForegroundColor Red
     } finally {
         Remove-Variable CaseNumber
-        clear-host
+        #clear-host
         Write-Host "Bye"
         Stop-Transcript
         EndScript

@@ -136,9 +136,9 @@ Function DisplayMenu {
         #Compressing logs#
         #clear-host
             
-        Write-Host "Moving $sourceFolder zip file to " c:\Dell\Logs\$CaseNumber.zip". This might take a while."
+        Write-Host "Moving $sourceFolder zip file to " c:\Dell\Logs\TSS-$CaseNumber-$(Get-Date -Format 'yyyyMMddHHmm').zip". This might take a while."
         $logtemp = Get-ChildItem -Path "$sourcefolder\*Cluster.zip"
-        Get-Childitem C:\Dell\SDP_*.zip -Recurse | Sort LastWriteTime | Select -Last 1 | %{ Move-Item -Path $_.fullname -Destination "c:\Dell\Logs\$CaseNumber.zip"}
+        Get-Childitem C:\Dell\SDP_*.zip -Recurse | Sort LastWriteTime | Select -Last 1 | %{ Move-Item -Path $_.fullname -Destination "c:\Dell\Logs\TSS-$CaseNumber-$(Get-Date -Format 'yyyyMMddHHmm').zip"}
 
         Remove-Item "C:\Dell\SDP_*" -Recurse -Force -ErrorAction Ignore
         $Shell = New-Object -ComObject "WScript.Shell"
